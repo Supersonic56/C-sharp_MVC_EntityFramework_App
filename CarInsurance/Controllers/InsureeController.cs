@@ -50,6 +50,7 @@ namespace CarInsurance.Controllers
         {
             if (ModelState.IsValid)
             {
+                insuree.Quote = Quote(insuree);
                 db.Insurees.Add(insuree);
                 db.SaveChanges();
                 return RedirectToAction("Index");
@@ -124,13 +125,13 @@ namespace CarInsurance.Controllers
             base.Dispose(disposing);
         }
 
-        public ActionResult Quote(string firstName, string lastName, string emailAddress, DateTime dateOfBirth, int carYear, string carMake, string carModel, bool dui, int speedingTickets, bool fullCoverage)
+        public decimal Quote(Insuree insuree)
         {
             decimal quote = 50m;
 
             // Age
-            int age = DateTime.Now.Year - dateOfBirth.Year;
-            if (dateOfBirth > DateTime.Now.AddYears(-age)) age--;
+            int age = DateTime.Now.Year - insuree.DateOfBirth.Year;
+            if (insuree.DateOfBirth > DateTime.Now.AddYears(-age)) age--;
 
             if (age <= 18)
             {
@@ -146,39 +147,40 @@ namespace CarInsurance.Controllers
             }
 
             // Car Year
-            if (carYear < 2000 || carYear > 2015)
+            if (insuree.CarYear < 2000 || insuree.CarYear > 2015)
             {
                 quote += 25m;
             }
 
             // Car Make
-            if (carMake.ToLower() == "porsche")
+            if (insuree.CarMake.ToLower() == "porsche")
             {
                 quote += 25m;
 
-                if (carModel.ToLower() == "911 carrera")
+                if (insuree.CarModel.ToLower() == "911 carrera")
                 {
                     quote += 25m;
                 }
             }
 
             // Speeding Tickets
-            quote += speedingTickets * 10m;
+            quote += insuree.SpeedingTickets * 10m;
 
             // DUI
-            if (dui)
+            if (insuree.DUI)
             {
                 quote *= 1.25m;
             }
 
-            // Full Coverage
-            if (fullCoverage)
+            // CoverageType means Full Coverage
+            if (insuree.CoverageType)
             {
                 quote *= 1.5m;
             }
 
-            return View("Quote", new Quote { MonthlyPremium = quote });
+            return quote;
         }
+
 
         public ActionResult Admin()
             {

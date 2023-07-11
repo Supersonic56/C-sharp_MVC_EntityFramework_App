@@ -1,6 +1,6 @@
 ﻿namespace CarInsurance.Controllers
 {
-    internal class Quote
+    class Quote
     {
         public decimal MonthlyPremium { get; set; }
     }
